@@ -1,0 +1,12 @@
+---
+iptables_sshd_port: "22"
+iptables_TCP_in: []
+iptables_TCP_out:
+  - "80"
+  - "443"
+  - "25"  
+iptables_UDP_in: []
+iptables_UDP_out:
+  - "53"
+  - "123"
+iptables_specific_rules: []

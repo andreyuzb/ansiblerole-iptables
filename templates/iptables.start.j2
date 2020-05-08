@@ -1,0 +1,64 @@
+#!/bin/bash
+
+IPTABLES="/sbin/iptables"
+IP6TABLES="/sbin/ip6tables"
+
+#clear IPv4 iptables
+$IPTABLES -F
+$IPTABLES -t nat -F
+$IPTABLES -t mangle -F
+$IPTABLES -X
+
+#clear IPv6 iptables
+$IP6TABLES -F
+$IP6TABLES -t nat -F
+$IP6TABLES -t mangle -F
+$IP6TABLES -X
+
+#set IPv4 default policy to drop
+$IPTABLES -P INPUT DROP
+$IPTABLES -P OUTPUT DROP
+$IPTABLES -P FORWARD ACCEPT
+
+#set IPv6 default policy to drop
+$IP6TABLES -P INPUT DROP
+$IP6TABLES -P OUTPUT DROP
+$IP6TABLES -P FORWARD DROP
+
+#accept everything no matter port on localhost
+$IPTABLES -A INPUT -i lo -j ACCEPT
+
+#allow established connections
+$IPTABLES -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+$IPTABLES -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+#Allow ICMP ping in all directions
+$IPTABLES -A INPUT -p icmp --icmp-type 0 -j ACCEPT
+$IPTABLES -A INPUT -p icmp --icmp-type 8 -j ACCEPT
+$IPTABLES -A OUTPUT -p icmp --icmp-type 0 -j ACCEPT
+$IPTABLES -A OUTPUT -p icmp --icmp-type 8 -j ACCEPT 
+
+#allow input on  SSH
+$IPTABLES -A INPUT -p tcp --dport {{ iptables_sshd_port }} -j ACCEPT
+
+{% for port in iptables_TCP_in %}
+$IPTABLES -A INPUT -p tcp --dport {{ port }} -j ACCEPT
+{% endfor %}
+
+{% for port in iptables_TCP_out %}
+$IPTABLES -A OUTPUT -p tcp --dport {{ port }} -j ACCEPT
+{% endfor %}
+
+{% for port in iptables_UDP_in %}
+$IPTABLES -A INPUT -p udp --dport {{ port }} -j ACCEPT
+$IPTABLES -A OUTPUT -p udp --sport {{ port }} -j ACCEPT
+{% endfor %}
+
+{% for port in iptables_UDP_out %}
+$IPTABLES -A OUTPUT -p udp --dport {{ port }} -j ACCEPT
+$IPTABLES -A INPUT -p udp --sport {{ port }} -j ACCEPT
+{% endfor %}
+
+{% for rule in iptables_specific_rules %}
+$IPTABLES {{ rule }}
+{% endfor %}

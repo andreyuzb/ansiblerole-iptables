@@ -1,0 +1,45 @@
+---
+- name: Update package list
+  apt:
+    update_cache: yes
+
+- name: Install iptables if it's not installed
+  apt: package=iptables state=present
+
+- name: stop and disable service ufw, if running
+  systemd:
+    name: ufw
+    state: stopped
+    enabled: no
+
+- name: Create init.d script for firewall
+  template:
+    src: firewall.sh.j2
+    dest: /etc/init.d/firewall.sh
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Creates directory for firewall configs
+  file:
+    path: /etc/firewall
+    state: directory
+    owner: root
+    group: root
+    mode: 0744
+
+- name: Create config for firewall
+  template:
+    src: iptables.start.j2
+    dest: /etc/firewall/iptables.start
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Enable service firewall
+  sysvinit:
+    name: firewall.sh
+    enabled: yes
+    state: started
+  async: 30
+  poll: 0
