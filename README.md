@@ -19,6 +19,7 @@ iptables_TCP_in - TCP ports, that should be opened on this server;
 iptables_TCP_out - Outside TCP services, that should work on this server;
 iptables_UDP_in - UDP ports, that should be opened on this server;
 iptables_UDP_out - Outside UDP services, that should work on this server;
+iptables_specific_rules - Specific rules, that need more flexibility in configuration;
 ```
 
 ----
