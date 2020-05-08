@@ -3,13 +3,15 @@
 ---
 
 Ansible Role for iptables based Linux firewall. It can be used in
-different distributives. Main
+different distributives. Main targets - Ubuntu and Debian Linux Operating
+Systems.
 
 *Main functions of the Role:*
 
 - Disable ufw firewall (if enabled);
 - Installing Iptables, if it's not installed;
-- Setting some sysctl.conf variables (Disable IPv6, Disable IP redirect);
+- Setting iptables rules;
+- Installing init.d sript and enable firewall service;
 
 ----
 
